@@ -20,7 +20,7 @@ section HelloWorld
   Printing a standard "Hello, world!" message.
   -/
 
-def helloWorld : IO Unit := 
+def helloWorld : IO Unit :=
   IO.println "Hello, world!"
 
 #eval helloWorld
@@ -32,7 +32,7 @@ namespace Sorting
   /-!
   ## Programs with proofs
 
-  A demonstration of a simple sorting algorithm with proof, 
+  A demonstration of a simple sorting algorithm with proof,
   loosely inspired by https://github.com/IPDSnelting/tba-2022/blob/master/TBA/AesopSort.lean.
   -/
 
@@ -47,11 +47,11 @@ variable {α : Type _} [LinearOrder α] [DecidableRel <| LE.le (α := α)]
 /-- Insert an element into a list according to the order. -/
 @[simp] def insertInOrder (a : α) : List α → List α
   | [] => [a]
-  | h :: tail => 
-    if a ≤ h then 
-      a :: h :: tail 
-    else 
-      h :: (insertInOrder a tail)   
+  | h :: tail =>
+    if a ≤ h then
+      a :: h :: tail
+    else
+      h :: (insertInOrder a tail)
 
 /-- A simple sorting algorithm based on insertion sort. -/
 @[simp] def insertionSort : List α → List α
@@ -61,19 +61,18 @@ variable {α : Type _} [LinearOrder α] [DecidableRel <| LE.le (α := α)]
 #eval insertionSort [4, 3]
 #eval insertionSort [1, 2349, 2, 21, 3, 0, 12, 33, 30, 54]
 
-attribute [simp] le_of_not_le
+attribute [simp] le_of_not_ge
 attribute [-simp] not_le
-
 /-- Inserting an element in a sorted list leaves the result sorted. -/
 lemma sorted_insertInOrder (l : List α) (hyp : isSorted l) (a : α) : isSorted (insertInOrder a l) := by
   induction l with
     | nil => simp
-    | cons h t ih => 
+    | cons h t ih =>
       match t with
-        | .nil => 
+        | .nil =>
           by_cases c:a ≤ h
           · simp [c]
-          · simp [c] 
+          · simp [c]
         | .cons h' t' =>
           by_cases c:a ≤ h
           · simp [c]
@@ -82,7 +81,7 @@ lemma sorted_insertInOrder (l : List α) (hyp : isSorted l) (a : α) : isSorted 
             by_cases c':a ≤ h'
             · simp [c']
               simp at hyp
-              exact ⟨le_of_not_le c, hyp.right⟩
+              exact ⟨le_of_not_ge c, hyp.right⟩
             · simp [c']
               simp [c'] at ih
               simp at hyp
@@ -92,7 +91,7 @@ lemma sorted_insertInOrder (l : List α) (hyp : isSorted l) (a : α) : isSorted 
 theorem sorted_insertionSort (l : List α) : isSorted (insertionSort l) := by
   induction l with
     | nil => simp
-    | cons h t ih => 
+    | cons h t ih =>
       simp
       apply sorted_insertInOrder
       exact ih
@@ -110,7 +109,7 @@ section FunctionalProgramming
   **How many powers of `2` less than `2^16` have a decimal expansion that ends in `2`?**
 
   While this can be solved in typical functional programming style, Lean also supports an imperative Python-like syntax which
-  is automatically translated to functional style code. 
+  is automatically translated to functional style code.
   -/
 
 def pow2Count : Nat := Id.run do
@@ -135,13 +134,13 @@ section Syntax
   /-!
   ## Syntax in Lean4
 
-  Being a interactive theorem prover meant for mathematics, Lean supports a rich and extensible syntax framework. 
+  Being a interactive theorem prover meant for mathematics, Lean supports a rich and extensible syntax framework.
   -/
 
 #check { x : Nat // x ≤ 1 }
 
 
-macro "The function that sends " x:ident " : " T:term " to the value " v:term : term =>
+macro "The " "function " "that " "sends " x:ident " : " T:term " to" " the" " value " v:term : term =>
   `(fun $x : $T ↦ $v)
 
 #eval (The function that sends n : Nat to the value n + 5) 2
@@ -153,7 +152,7 @@ section SymbolicAlgebra
   /-!
   ## Symbolic Algebra
 
-  Lean can be extended to interface with external symbolic algebra softwares to perform 
+  Lean can be extended to interface with external symbolic algebra softwares to perform
   *unverified* symbolic algebra calculations from the Lean editor.
   -/
 
@@ -171,7 +170,7 @@ syntax arith "^" arith : arith
 syntax "(" arith ")" : arith
 
 def arithToString : TSyntax `arith → String :=
-  fun stx ↦stx.raw.reprint.get! 
+  fun stx ↦stx.raw.reprint.get!
 
 open IO.Process in -- code by Max Nowak from https://leanprover.zulipchat.com/#narrow/stream/270676-lean4/topic/external.20process/near/345090183
 /-- Pipe input into stdin of the spawned process, then return output upon completion. -/
@@ -187,8 +186,8 @@ def cmd_with_stdin (args : SpawnArgs) (input : String) : IO Output := do
   return { exitCode, stdout, stderr }
 
 def queryPari (a : TSyntax `arith) : IO String := do
-  let out ← cmd_with_stdin 
-              { cmd := "gp", args := #["-q"]} 
+  let out ← cmd_with_stdin
+              { cmd := "gp", args := #["-q"]}
               <| arithToString a
   return out.stdout
 
@@ -221,7 +220,7 @@ def getDocstrings : MetaM <| List String := do
   let env ← getEnv
   let modIdx := env.getModuleIdxFor? env.mainModule
   env.constants.toList.filterMapM <| fun ⟨nm, _⟩ ↦ do
-    if env.getModuleIdxFor? nm = modIdx then
+    if env.getModuleIdxFor? nm == modIdx then
       findDocString? env nm
     else pure none
 
@@ -234,7 +233,7 @@ section Tactics
   /-!
   ## Tactics
 
-  Lean allows proof automation via tactics. 
+  Lean allows proof automation via tactics.
   Lean's tactic framework is highly extensible, allowing users to implement their own automation.
   -/
 
@@ -242,9 +241,10 @@ example (a b : ℤ) : (a + b)^2 = a^2 + 2*a*b + b^2 := by ring
 
 open Lean Elab Term Tactic in
 elab "trace_goal" : tactic => do
-  let mainGoal ← getMainGoal 
+  let mainGoal ← getMainGoal
   logInfo m!"The goal is {mainGoal}"
 
+set_option linter.unusedTactic false in
 example : 1 = 1 := by
   trace_goal
   rfl
@@ -282,7 +282,7 @@ section Showcase
     - [Lean4 Maze](https://github.com/dwrensha/lean4-maze) - A maze game in Lean4
     - [Lean To](https://github.com/bollu/lean-to) - Experimental Jupyter notebook interface for Lean4
     - [GAP Lean](https://github.com/opencompl/lean-gap) - A GAP embedding in Lean4
-    - [Lean Loris](https://github.com/siddhartha-gadgil/lean-loris) - Experiments in forward reasoning in Lean4 
+    - [Lean Loris](https://github.com/siddhartha-gadgil/lean-loris) - Experiments in forward reasoning in Lean4
   -/
 
 end Showcase

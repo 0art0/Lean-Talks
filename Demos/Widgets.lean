@@ -15,7 +15,7 @@ sections of a Lean document. User widgets are rendered in the Lean infoview.
 To try it out, simply type in the following code and place your cursor over the `#widget` command.
 -/
 
-@[widget]
+@[widget_module]
 def helloWidget : UserWidgetDefinition where
   name := "Hello"
   javascript := "
@@ -25,7 +25,7 @@ def helloWidget : UserWidgetDefinition where
       return React.createElement('p', {}, name + '!')
     }"
 
-#widget helloWidget .null
+#widget helloWidget with Json.null
 
 /-!
 If you want to dive into a full sample right away, check out
@@ -56,7 +56,7 @@ to the React component. In our first invocation of `#widget`, we set it to `.nul
 happens when you type in:
 -/
 
-#widget helloWidget (Json.mkObj [("name", "<your name here>")])
+#widget helloWidget with Json.mkObj [("name", "<your name here>")]
 
 /-!
 💡 NOTE: The RPC system presented below does not depend on JavaScript. However the primary use case
@@ -111,8 +111,7 @@ def getType (params : GetTypeParams) : RequestM (RequestTask CodeWithInfos) :=
   withWaitFindSnapAtPos params.pos fun snap => do
     runTermElabM snap do
       let name ← resolveGlobalConstNoOverloadCore params.name
-      let some c ← Meta.getConst? name
-        | throwThe RequestError ⟨.invalidParams, s!"no constant named '{name}'"⟩
+      let c ← getConstInfo name
       Widget.ppExprTagged c.type
 
 /-!
@@ -132,7 +131,7 @@ on this we either display an `InteractiveCode` with the type, `mapRpcError` the 
 to turn it into a readable message, or show a `Loading..` message, respectively.
 -/
 
-@[widget]
+@[widget_module]
 def checkWidget : UserWidgetDefinition where
   name := "#check as a service"
   javascript := "
@@ -160,7 +159,7 @@ export default function(props) {
 Finally we can try out the widget.
 -/
 
-#widget checkWidget .null
+#widget checkWidget with Json.null
 
 /-!
 ![`#check` as a service](../images/widgets_caas.png)
@@ -193,7 +192,7 @@ interact with the text editor.
 You can see the full API for this [here](https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview-api/src/infoviewApi.ts#L52)
 -/
 
-@[widget]
+@[widget_module]
 def insertTextWidget : UserWidgetDefinition where
   name := "textInserter"
   javascript := "
@@ -213,9 +212,9 @@ export default function(props) {
 
 /-! Finally, we can try this out: -/
 
-#widget insertTextWidget .null
+#widget insertTextWidget with Json.null
 
-@[widget]
+@[widget_module]
 def rubiks : UserWidgetDefinition := {
   name := "Rubik's cube"
   javascript:= include_str "widget" / "dist" / "rubiks.js"
@@ -229,4 +228,4 @@ def eg : RubiksProps := {seq := #["L", "D⁻¹", "U⁻¹", "L", "D", "D", "L", "
 
 #eval toJson eg
 
-#widget rubiks (toJson eg)
+#widget rubiks with eg

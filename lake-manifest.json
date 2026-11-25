@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "20c722ce259f8eaf9e631ca55e41fd5cfe862955",
+   "rev": "eb5f98fd9619aec9e9262382223c3d68fe208356",
    "name": "leanslides",
    "manifestFile": "lake-manifest.json",
    "inputRev": "master",

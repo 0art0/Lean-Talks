@@ -260,7 +260,7 @@ section Widgets
 open Lean ProofWidgets
 open scoped ProofWidgets.Jsx
 
-#html <Rubiks seq={eg} />
+#html jsx% {<Rubiks seq={eg} />}
 
 end Widgets
 

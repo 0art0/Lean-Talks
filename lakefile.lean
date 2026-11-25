@@ -16,7 +16,7 @@ lean_lib TypeTheoryTalks {
 }
 
 @[default_target]
-lean_lib LeanIntroTalks {
+lean_lib LeanTalks {
   precompileModules := true
 }
 
